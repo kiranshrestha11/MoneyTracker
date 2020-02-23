@@ -27,16 +27,27 @@ class MoneyTrackPage extends StatefulWidget {
 
 class _MoneyTrackPageState extends State<MoneyTrackPage> {
   List<Transaction> _userTransaction = [
-    Transaction(title: "Watch", price: 2000, dateTime: DateTime.now()),
-    Transaction(title: "Car", price: 7000, dateTime: DateTime.now()),
-    Transaction(title: "Phone", price: 1000, dateTime: DateTime.now()),
+//    Transaction(title: "Watch", price: 2000, dateTime: DateTime.now()),
+//    Transaction(title: "Car", price: 7000, dateTime: DateTime.now()),
+//    Transaction(title: "Phone", price: 1000, dateTime: DateTime.now()),
   ];
 
-  void _addTransaction(String txTitle, double txPrice) {
+  void _addTransaction(String txTitle, double txPrice, DateTime txDate) {
     Transaction newTx = new Transaction(
-        title: txTitle, price: txPrice, dateTime: DateTime.now());
+        id: DateTime.now().toString(),
+        title: txTitle,
+        price: txPrice,
+        dateTime: txDate);
     setState(() {
       _userTransaction.add(newTx);
+    });
+  }
+
+  void _deleteTransaction(String id) {
+    setState(() {
+      _userTransaction.removeWhere((tx) {
+        return tx.id == id;
+      });
     });
   }
 
@@ -71,7 +82,7 @@ class _MoneyTrackPageState extends State<MoneyTrackPage> {
       body: Column(
         children: <Widget>[
           Chart(_recentTransaction),
-          TransactionList(_userTransaction),
+          TransactionList(_userTransaction, _deleteTransaction),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

@@ -3,22 +3,28 @@ import 'package:moneytracker/model/transaction.dart';
 import 'package:moneytracker/widgets/chartbar.dart';
 
 class Chart extends StatelessWidget {
-  final List<Transaction> _recenTransaction;
-  Chart(this._recenTransaction);
+  final List<Transaction> _recentTransaction;
+  Chart(this._recentTransaction);
 
   List<Map<String, Object>> get groupedTransaction {
     return List.generate(7, (index) {
       final weekDay = DateTime.now().subtract(Duration(days: index));
       double totalSum = 0.0;
-      for (int i = 0; i < _recenTransaction.length; i++) {
-        if (_recenTransaction[i].dateTime.day == weekDay.day &&
-            _recenTransaction[i].dateTime.month == weekDay.month &&
-            _recenTransaction[i].dateTime.year == weekDay.year) {
-          totalSum += _recenTransaction[i].price;
+      for (int i = 0; i < _recentTransaction.length; i++) {
+        if (_recentTransaction[i].dateTime.day == weekDay.day &&
+            _recentTransaction[i].dateTime.month == weekDay.month &&
+            _recentTransaction[i].dateTime.year == weekDay.year) {
+          totalSum += _recentTransaction[i].price;
         }
       }
       return {'day': "S", 'amount': totalSum};
     }).reversed.toList();
+  }
+
+  double get totalSpending {
+    return groupedTransaction.fold(0.0, (sum, item) {
+      return sum + item['amount'];
+    });
   }
 
   @override
@@ -29,7 +35,16 @@ class Chart extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: groupedTransaction.map((tx) {
-            return ChartBar(tx["amount"] as double, tx["day"]);
+            return Flexible(
+              fit: FlexFit.tight,
+              child: ChartBar(
+                tx["amount"] as double,
+                tx["day"],
+                totalSpending == 0.0
+                    ? 0.0
+                    : (tx['amount'] as double) / totalSpending,
+              ),
+            );
           }).toList(),
         ));
   }
