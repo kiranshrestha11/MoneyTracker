@@ -14,37 +14,47 @@ class _NewTransactionState extends State<NewTransaction> {
   final amountController = new TextEditingController();
 
   void addToTransaction() {
-    print(titleController.text);
-    print(amountController.text);
-    widget.addTx(
-        titleController.text, double.parse(amountController.text.trim()));
+    String title = titleController.text;
+    double price = double.parse(amountController.text);
+
+    if (title.isEmpty || price < 0) {
+      return;
+    }
+
+    widget.addTx(title, price);
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(10.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
             TextField(
               decoration: InputDecoration(labelText: "Enter the title"),
+              controller: titleController,
             ),
             TextField(
-              keyboardType: TextInputType.number,
               decoration: InputDecoration(labelText: "Enter the amount"),
+              controller: amountController,
+              keyboardType: TextInputType.number,
             ),
             RaisedButton(
-              child: Text(
-                "Add Transaction",
-                style: TextStyle(color: Colors.white),
-              ),
               color: Colors.green,
+              child: Text(
+                "Add transaction",
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: Colors.white),
+              ),
               onPressed: () {
                 addToTransaction();
               },
-            )
+            ),
           ],
         ),
       ),

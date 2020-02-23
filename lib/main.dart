@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:moneytracker/model/transaction.dart';
+import 'package:moneytracker/widgets/chart.dart';
 import 'package:moneytracker/widgets/new_transaction.dart';
+import 'package:moneytracker/widgets/transaction_list.dart';
 
 void main() => runApp(MyApp());
 
@@ -10,6 +12,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Money Tracker",
       home: MoneyTrackPage(),
+      theme: ThemeData(
+          primaryColor: Colors.brown,
+          accentColor: Colors.green,
+          fontFamily: "Arvo"),
     );
   }
 }
@@ -22,9 +28,10 @@ class MoneyTrackPage extends StatefulWidget {
 class _MoneyTrackPageState extends State<MoneyTrackPage> {
   List<Transaction> _userTransaction = [
     Transaction(title: "Watch", price: 2000, dateTime: DateTime.now()),
-    Transaction(title: "Groceries", price: 1000, dateTime: DateTime.now()),
-    Transaction(title: "Laptop", price: 4000, dateTime: DateTime.now()),
+    Transaction(title: "Car", price: 7000, dateTime: DateTime.now()),
+    Transaction(title: "Phone", price: 1000, dateTime: DateTime.now()),
   ];
+
   void _addTransaction(String txTitle, double txPrice) {
     Transaction newTx = new Transaction(
         title: txTitle, price: txPrice, dateTime: DateTime.now());
@@ -33,10 +40,16 @@ class _MoneyTrackPageState extends State<MoneyTrackPage> {
     });
   }
 
+  List<Transaction> get _recentTransaction {
+    return _userTransaction.where((tx) {
+      return tx.dateTime.isAfter(DateTime.now().subtract(Duration(days: 7)));
+    }).toList();
+  }
+
   void showBtSheet(BuildContext ctx) {
     showModalBottomSheet(
         context: ctx,
-        builder: (bctx) {
+        builder: (bCtx) {
           return NewTransaction(_addTransaction);
         });
   }
@@ -57,33 +70,8 @@ class _MoneyTrackPageState extends State<MoneyTrackPage> {
       ),
       body: Column(
         children: <Widget>[
-          Card(
-            child: Container(
-              width: double.infinity,
-              child: Text("Chart"),
-            ),
-          ),
-          Column(
-              children: _userTransaction.map((tx) {
-            return Card(
-              child: ListTile(
-                leading: CircleAvatar(
-                  child: Text(tx.price.toString()),
-                ),
-                title: Text(
-                  tx.title,
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18),
-                ),
-                subtitle: Text(
-                  tx.dateTime.toString(),
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
-            );
-          }).toList())
+          Chart(_recentTransaction),
+          TransactionList(_userTransaction),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
